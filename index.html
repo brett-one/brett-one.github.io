@@ -18,25 +18,14 @@
       background: black;
     }
 
-    .hud {
-      position: fixed;
-      top: 10px;
-      left: 12px;
-      color: #00ff99;
-      font-size: 18px;
-      z-index: 10;
-      user-select: none;
-    }
   </style>
 </head>
 <body>
-  <div class="hud" id="hud">Angle: 0.0°</div>
   <canvas id="screen"></canvas>
 
   <script>
     const canvas = document.getElementById("screen");
     const ctx = canvas.getContext("2d");
-    const hud = document.getElementById("hud");
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -48,7 +37,8 @@
     const ball = {
       x: 200,
       y: 150,
-      radius: 24,
+      width: 120,
+      height: 54,
       vx: 4.2,
       vy: 3.1,
       color: "#ffffff"
@@ -69,48 +59,38 @@
     }
 
     function bounceFromWalls() {
-      if (ball.x - ball.radius <= 0) {
-        ball.x = ball.radius;
+      if (ball.x <= 0) {
+        ball.x = 0;
         ball.vx = -ball.vx;
         ball.color = randomColor();
       }
 
-      if (ball.x + ball.radius >= canvas.width) {
-        ball.x = canvas.width - ball.radius;
+      if (ball.x + ball.width >= canvas.width) {
+        ball.x = canvas.width - ball.width;
         ball.vx = -ball.vx;
         ball.color = randomColor();
       }
 
-      if (ball.y - ball.radius <= 0) {
-        ball.y = ball.radius;
+      if (ball.y <= 0) {
+        ball.y = 0;
         ball.vy = -ball.vy;
         ball.color = randomColor();
       }
 
-      if (ball.y + ball.radius >= canvas.height) {
-        ball.y = canvas.height - ball.radius;
+      if (ball.y + ball.height >= canvas.height) {
+        ball.y = canvas.height - ball.height;
         ball.vy = -ball.vy;
         ball.color = randomColor();
       }
     }
 
+    const dvdLogo = new Image();
+    dvdLogo.src = "./assets/dvd-logo.svg";
+
     function drawBall() {
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-      ctx.fillStyle = ball.color;
-      ctx.fill();
-
-      const dirLen = ball.radius + 16;
-      const mag = Math.hypot(ball.vx, ball.vy);
-      const dx = (ball.vx / mag) * dirLen;
-      const dy = (ball.vy / mag) * dirLen;
-
-      ctx.beginPath();
-      ctx.moveTo(ball.x, ball.y);
-      ctx.lineTo(ball.x + dx, ball.y + dy);
-      ctx.strokeStyle = "#00ff99";
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      if (dvdLogo.complete) {
+        ctx.drawImage(dvdLogo, ball.x, ball.y, ball.width, ball.height);
+      }
     }
 
     function animate() {
@@ -122,8 +102,6 @@
       bounceFromWalls();
       drawBall();
 
-      const angle = getAngleDegrees(ball.vx, ball.vy);
-      hud.textContent = `Angle: ${angle.toFixed(1)}°`;
 
       requestAnimationFrame(animate);
     }
