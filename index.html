@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DVD Screensaver with Color Cycle</title>
+  <title>DVD Screensaver</title>
   <style>
     html, body {
       margin: 0;
@@ -46,6 +46,7 @@
 
     canvas {
       display: block;
+      background: black;
     }
   </style>
 </head>
@@ -54,123 +55,114 @@
     <button id="startBtn" disabled>Start DVD</button>
     <span id="status">Loading image…</span>
   </div>
+
   <canvas id="screen"></canvas>
 
   <script>
-  const canvas = document.getElementById("screen");
-  const ctx = canvas.getContext("2d");
-  const ui = document.getElementById("ui");
-  const startBtn = document.getElementById("startBtn");
-  const statusEl = document.getElementById("status");
+    const canvas = document.getElementById("screen");
+    const ctx = canvas.getContext("2d");
+    const ui = document.getElementById("ui");
+    const startBtn = document.getElementById("startBtn");
+    const statusEl = document.getElementById("status");
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
-
-  const dvdLogo = new Image();
-  dvdLogo.src = "./assets/dvd-logo.png"; // or .jpg if that's your file
-
-  const dvd = {
-    x: 200,
-    y: 150,
-    width: 160,
-    height: 80,
-    vx: 4,
-    vy: 3
-  };
-
-  let running = false;
-
-  const bgColors = ["#001f3f", "#003f1f", "#3f0000"];
-  let bgIndex = 0;
-
-  function bounceFromWalls() {
-    let collided = false;
-
-    if (dvd.x <= 0) {
-      dvd.x = 0;
-      dvd.vx = -dvd.vx;
-      collided = true;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    if (dvd.x + dvd.width >= canvas.width) {
-      dvd.x = canvas.width - dvd.width;
-      dvd.vx = -dvd.vx;
-      collided = true;
-    }
-    if (dvd.y <= 0) {
-      dvd.y = 0;
-      dvd.vy = -dvd.vy;
-      collided = true;
-    }
-    if (dvd.y + dvd.height >= canvas.height) {
-      dvd.y = canvas.height - dvd.height;
-      dvd.vy = -dvd.vy;
-      collided = true;
-    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-    if (collided) {
-      bgIndex = (bgIndex + 1) % bgColors.length;
-    }
-  }
+    const dvdLogo = new Image();
+    dvdLogo.src = "./assets/dvd-logo.png"; // change to .jpg if needed
 
-  function drawFrame() {
-    const margin = 10;
-    ctx.clearRect(
-      dvd.x - margin,
-      dvd.y - margin,
-      dvd.width + margin * 2,
-      dvd.height + margin * 2
-    );
+    const dvd = {
+      x: 200,
+      y: 150,
+      width: 160,
+      height: 80,
+      vx: 4,
+      vy: 3
+    };
 
-    ctx.fillStyle = bgColors[bgIndex];
-    ctx.fillRect(dvd.x, dvd.y, dvd.width, dvd.height);
+    let running = false;
 
-    ctx.drawImage(dvdLogo, dvd.x, dvd.y, dvd.width, dvd.height);
-  }
+    // Brighter colors behind the logo only
+    const bgColors = ["#0074FF", "#00FF66", "#FF0033"];
+    let bgIndex = 0;
 
-  function animate() {
-    if (!running) return;
+    function bounceFromWalls() {
+      let collided = false;
 
-    dvd.x += dvd.vx;
-    dvd.y += dvd.vy;
-    bounceFromWalls();
-    drawFrame();
+      if (dvd.x <= 0) {
+        dvd.x = 0;
+        dvd.vx = -dvd.vx;
+        collided = true;
+      }
+      if (dvd.x + dvd.width >= canvas.width) {
+        dvd.x = canvas.width - dvd.width;
+        dvd.vx = -dvd.vx;
+        collided = true;
+      }
+      if (dvd.y <= 0) {
+        dvd.y = 0;
+        dvd.vy = -dvd.vy;
+        collided = true;
+      }
+      if (dvd.y + dvd.height >= canvas.height) {
+        dvd.y = canvas.height - dvd.height;
+        dvd.vy = -dvd.vy;
+        collided = true;
+      }
 
-    requestAnimationFrame(animate);
-  }
-
-  dvdLogo.onload = () => {
-    statusEl.textContent = "Image loaded. Click Start.";
-    startBtn.disabled = false;
-
-    dvd.x = canvas.width / 2 - dvd.width / 2;
-    dvd.y = canvas.height / 2 - dvd.height / 2;
-    drawFrame();
-  };
-
-  dvdLogo.onerror = () => {
-    statusEl.textContent = "Error loading DVD image.";
-    startBtn.disabled = true;
-  };
-
-  startBtn.addEventListener("click", () => {
-    if (!dvdLogo.complete) {
-      statusEl.textContent = "Still loading image…";
-      return;
+      if (collided) {
+        bgIndex = (bgIndex + 1) % bgColors.length;
+      }
     }
 
-    running = true;
-    // Hide the UI entirely after starting
-    ui.style.display = "none";
+    function drawFrame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Optionally clear any status text; it will be hidden anyway
-    statusEl.textContent = "";
+      ctx.fillStyle = bgColors[bgIndex];
+      ctx.fillRect(dvd.x, dvd.y, dvd.width, dvd.height);
 
-    animate();
-  });
-</script>
+      ctx.drawImage(dvdLogo, dvd.x, dvd.y, dvd.width, dvd.height);
+    }
+
+    function animate() {
+      if (!running) return;
+
+      dvd.x += dvd.vx;
+      dvd.y += dvd.vy;
+      bounceFromWalls();
+      drawFrame();
+
+      requestAnimationFrame(animate);
+    }
+
+    dvdLogo.onload = () => {
+      statusEl.textContent = "Image loaded. Click Start.";
+      startBtn.disabled = false;
+
+      dvd.x = canvas.width / 2 - dvd.width / 2;
+      dvd.y = canvas.height / 2 - dvd.height / 2;
+      drawFrame();
+    };
+
+    dvdLogo.onerror = () => {
+      statusEl.textContent = "Error loading DVD image.";
+      startBtn.disabled = true;
+    };
+
+    startBtn.addEventListener("click", () => {
+      if (!dvdLogo.complete) {
+        statusEl.textContent = "Still loading image…";
+        return;
+      }
+
+      running = true;
+      ui.style.display = "none";
+      animate();
+    });
+  </script>
 </body>
 </html>
