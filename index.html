@@ -1,24 +1,134 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Simple Site</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bouncing Ball Screensaver</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
       font-family: Arial, sans-serif;
-      max-width: 700px;
-      margin: 60px auto;
-      padding: 0 20px;
-      line-height: 1.6;
     }
-    h1 { color: #222; }
-    a { color: #0066cc; }
+
+    canvas {
+      display: block;
+      background: black;
+    }
+
+    .hud {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      color: #00ff99;
+      font-size: 18px;
+      z-index: 10;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
-  <h1>Test from GitHub Pages</h1>
-  <p>This is my simple HTML website.</p>
-  <p><a href="https://github.com" target="_blank" rel="noopener noreferrer">Visit GitHub</a></p>
+  <div class="hud" id="hud">Angle: 0.0°</div>
+  <canvas id="screen"></canvas>
+
+  <script>
+    const canvas = document.getElementById("screen");
+    const ctx = canvas.getContext("2d");
+    const hud = document.getElementById("hud");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const ball = {
+      x: 200,
+      y: 150,
+      radius: 24,
+      vx: 4.2,
+      vy: 3.1,
+      color: "#ffffff"
+    };
+
+    function getAngleDegrees(vx, vy) {
+      let angle = Math.atan2(vy, vx) * 180 / Math.PI;
+      if (angle < 0) angle += 360;
+      return angle;
+    }
+
+    function randomColor() {
+      const colors = [
+        "#ffffff", "#ff4444", "#44aaff", "#ffee44",
+        "#44ff88", "#ff66cc", "#ff9933"
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function bounceFromWalls() {
+      if (ball.x - ball.radius <= 0) {
+        ball.x = ball.radius;
+        ball.vx = -ball.vx;
+        ball.color = randomColor();
+      }
+
+      if (ball.x + ball.radius >= canvas.width) {
+        ball.x = canvas.width - ball.radius;
+        ball.vx = -ball.vx;
+        ball.color = randomColor();
+      }
+
+      if (ball.y - ball.radius <= 0) {
+        ball.y = ball.radius;
+        ball.vy = -ball.vy;
+        ball.color = randomColor();
+      }
+
+      if (ball.y + ball.radius >= canvas.height) {
+        ball.y = canvas.height - ball.radius;
+        ball.vy = -ball.vy;
+        ball.color = randomColor();
+      }
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+
+      const dirLen = ball.radius + 16;
+      const mag = Math.hypot(ball.vx, ball.vy);
+      const dx = (ball.vx / mag) * dirLen;
+      const dy = (ball.vy / mag) * dirLen;
+
+      ctx.beginPath();
+      ctx.moveTo(ball.x, ball.y);
+      ctx.lineTo(ball.x + dx, ball.y + dy);
+      ctx.strokeStyle = "#00ff99";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      bounceFromWalls();
+      drawBall();
+
+      const angle = getAngleDegrees(ball.vx, ball.vy);
+      hud.textContent = `Angle: ${angle.toFixed(1)}°`;
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
 </body>
 </html>
