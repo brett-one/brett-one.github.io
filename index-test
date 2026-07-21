@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DVD Test</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      font-family: Arial, sans-serif;
+      color: #00ff99;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #info {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      font-size: 14px;
+    }
+
+    #dvdLogo {
+      max-width: 50vw;
+      max-height: 30vh;
+      border: 1px solid #00ff99;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">DVD test page</div>
+
+  <img
+    id="dvdLogo"
+    src="/assets/dvd-logo.svg"
+    alt="DVD Logo"
+  />
+
+  <script>
+    const dvdLogo = document.getElementById("dvdLogo");
+    const info = document.getElementById("info");
+
+    dvdLogo.onload = () => {
+      info.textContent = "DVD image loaded and visible.";
+    };
+
+    dvdLogo.onerror = () => {
+      info.textContent = "ERROR: DVD image failed to load.";
+    };
+  </script>
+</body>
+</html>
