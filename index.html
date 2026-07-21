@@ -85,12 +85,9 @@
     }
 
     const dvdLogo = new Image();
-    dvdLogo.src = "./assets/dvd-logo.svg";
 
     function drawBall() {
-      if (dvdLogo.complete) {
-        ctx.drawImage(dvdLogo, ball.x, ball.y, ball.width, ball.height);
-      }
+      ctx.drawImage(dvdLogo, ball.x, ball.y, ball.width, ball.height);
     }
 
     function animate() {
@@ -106,7 +103,11 @@
       requestAnimationFrame(animate);
     }
 
-    animate();
+    dvdLogo.onload = () => {
+      animate();
+    };
+
+    dvdLogo.src = "./assets/dvd-logo.svg";
   </script>
 </body>
 </html>
