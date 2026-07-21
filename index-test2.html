@@ -25,10 +25,11 @@
     }
 
     #dvdLogo {
-      width: 200px;   /* force non-zero size */
-      height: 100px;  /* force non-zero size */
+      width: 200px;
+      height: 100px;
       border: 1px solid #00ff99;
       display: block;
+      object-fit: contain;
     }
   </style>
 </head>
@@ -37,7 +38,7 @@
 
   <img
     id="dvdLogo"
-    src="/assets/dvd-logo.svg"
+    src="/assets/dvd-logo.png"
     alt="DVD Logo"
   />
 
@@ -46,11 +47,11 @@
     const info = document.getElementById("info");
 
     dvdLogo.onload = () => {
-      info.textContent = "DVD image loaded and visible.";
+      info.textContent = "DVD PNG loaded and visible.";
     };
 
     dvdLogo.onerror = () => {
-      info.textContent = "ERROR: DVD image failed to load.";
+      info.textContent = "ERROR: DVD PNG failed to load.";
     };
   </script>
 </body>
