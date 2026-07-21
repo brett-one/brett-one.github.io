@@ -1,109 +1,114 @@
-<script>
-  const canvas = document.getElementById("screen");
-  const ctx = canvas.getContext("2d");
-  const startBtn = document.getElementById("startBtn");
-  const statusEl = document.getElementById("status");
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
-
-  function drawTestSquare() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#00ff99";
-    ctx.fillRect(canvas.width / 2 - 25, canvas.height / 2 - 25, 50, 50);
-  }
-
-  const dvdLogo = new Image();
-  dvdLogo.src = "/assets/dvd-logo.svg";  // absolute path
-
-  const dvd = {
-    x: 200,
-    y: 150,
-    width: 120,
-    height: 54,
-    vx: 4,
-    vy: 3
-  };
-
-  let running = false;
-
-  function bounceFromWalls() {
-    if (dvd.x <= 0) {
-      dvd.x = 0;
-      dvd.vx = -dvd.vx;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DVD Screensaver V2</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      font-family: Arial, sans-serif;
+      color: #00ff99;
     }
-    if (dvd.x + dvd.width >= canvas.width) {
-      dvd.x = canvas.width - dvd.width;
-      dvd.vx = -dvd.vx;
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    if (dvd.y <= 0) {
-      dvd.y = 0;
-      dvd.vy = -dvd.vy;
+
+    #ui {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      user-select: none;
+      z-index: 10;
     }
-    if (dvd.y + dvd.height >= canvas.height) {
-      dvd.y = canvas.height - dvd.height;
-      dvd.vy = -dvd.vy;
+
+    #startBtn {
+      padding: 6px 14px;
+      background: #00ff99;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
     }
-  }
 
-  function drawFrame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(dvdLogo, dvd.x, dvd.y, dvd.width, dvd.height);
-  }
-
-  function animate() {
-    if (!running) return;
-
-    dvd.x += dvd.vx;
-    dvd.y += dvd.vy;
-    bounceFromWalls();
-    drawFrame();
-
-    requestAnimationFrame(animate);
-  }
-
-  dvdLogo.onload = () => {
-    statusEl.textContent = "Image loaded. Click Start.";
-    startBtn.disabled = false;
-
-    // Show the DVD logo once in the center BEFORE Start
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(
-      dvdLogo,
-      canvas.width / 2 - dvd.width / 2,
-      canvas.height / 2 - dvd.height / 2,
-      dvd.width,
-      dvd.height
-    );
-  };
-
-  dvdLogo.onerror = () => {
-    statusEl.textContent = "Error loading /assets/dvd-logo.svg";
-    startBtn.disabled = true;
-    // Show test square instead
-    drawTestSquare();
-  };
-
-  startBtn.addEventListener("click", () => {
-    if (!dvdLogo.complete) {
-      statusEl.textContent = "Still loading image…";
-      return;
+    #startBtn:disabled {
+      opacity: 0.4;
+      cursor: default;
     }
-    running = true;
-    startBtn.disabled = true;
-    statusEl.textContent = "Running…";
-    animate();
-  });
 
-  // Safety: show test square if loading is slow
-  setTimeout(() => {
-    if (!dvdLogo.complete) {
-      statusEl.textContent = "Taking long to load. Showing test square.";
-      drawTestSquare();
+    #status {
+      font-size: 14px;
     }
-  }, 4000);
-</script>
+
+    #dvdWrapper {
+      width: 200px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #dvdLogo {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* Simple bounce animation (will apply after Start) */
+    .bouncing {
+      position: relative;
+      animation: bounce 3s linear infinite;
+    }
+
+    @keyframes bounce {
+      0%   { transform: translate(-40vw, -20vh); }
+      25%  { transform: translate(40vw, -20vh); }
+      50%  { transform: translate(40vw, 20vh); }
+      75%  { transform: translate(-40vw, 20vh); }
+      100% { transform: translate(-40vw, -20vh); }
+    }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <button id="startBtn" disabled>Start DVD</button>
+    <span id="status">Loading image…</span>
+  </div>
+
+  <div id="dvdWrapper">
+    <img id="dvdLogo" src="/assets/dvd-logo.svg" alt="DVD Logo" />
+  </div>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const statusEl = document.getElementById("status");
+    const dvdLogo = document.getElementById("dvdLogo");
+
+    dvdLogo.onload = () => {
+      statusEl.textContent = "Image loaded. Click Start.";
+      startBtn.disabled = false;
+    };
+
+    dvdLogo.onerror = () => {
+      statusEl.textContent = "Error loading /assets/dvd-logo.svg";
+      startBtn.disabled = true;
+    };
+
+    startBtn.addEventListener("click", () => {
+      startBtn.disabled = true;
+      statusEl.textContent = "Running…";
+      dvdLogo.classList.add("bouncing");
+    });
+  </script>
+</body>
+</html>
