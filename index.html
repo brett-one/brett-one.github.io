@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DVD Screensaver</title>
+  <title>DVD Screensaver V2</title>
   <style>
     html, body {
       margin: 0;
@@ -14,36 +14,6 @@
       color: #00ff99;
     }
 
-    #ui {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      z-index: 10;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      user-select: none;
-    }
-
-    #startBtn {
-      padding: 6px 14px;
-      background: #00ff99;
-      color: #000;
-      border: none;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    #startBtn:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-
-    #status {
-      font-size: 14px;
-    }
-
     canvas {
       display: block;
       background: black;
@@ -51,19 +21,11 @@
   </style>
 </head>
 <body>
-  <div id="ui">
-    <button id="startBtn" disabled>Start DVD</button>
-    <span id="status">Loading image…</span>
-  </div>
-
   <canvas id="screen"></canvas>
 
   <script>
     const canvas = document.getElementById("screen");
     const ctx = canvas.getContext("2d");
-    const ui = document.getElementById("ui");
-    const startBtn = document.getElementById("startBtn");
-    const statusEl = document.getElementById("status");
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -73,21 +35,18 @@
     window.addEventListener("resize", resizeCanvas);
 
     const dvdLogo = new Image();
-    dvdLogo.src = "./assets/dvd-logo.png"; // change to .jpg if needed
+    dvdLogo.src = "./assets/dvd-logo.png"; // or .jpg if that's your file
 
     const dvd = {
       x: 200,
       y: 150,
       width: 160,
       height: 80,
-      vx: 4,
-      vy: 3
+      vx: 2,  // speed control: lower = slower
+      vy: 2
     };
 
-    let running = false;
-
-    // Brighter colors behind the logo only
-    const bgColors = ["#0074FF", "#00FF66", "#FF0033"];
+    const bgColors = ["#0074FF", "#00FF66", "#FF0033"]; // bright blue, green, red
     let bgIndex = 0;
 
     function bounceFromWalls() {
@@ -129,8 +88,6 @@
     }
 
     function animate() {
-      if (!running) return;
-
       dvd.x += dvd.vx;
       dvd.y += dvd.vy;
       bounceFromWalls();
@@ -140,29 +97,16 @@
     }
 
     dvdLogo.onload = () => {
-      statusEl.textContent = "Image loaded. Click Start.";
-      startBtn.disabled = false;
-
       dvd.x = canvas.width / 2 - dvd.width / 2;
       dvd.y = canvas.height / 2 - dvd.height / 2;
       drawFrame();
+      // Auto-start animation once image is ready
+      animate();
     };
 
     dvdLogo.onerror = () => {
-      statusEl.textContent = "Error loading DVD image.";
-      startBtn.disabled = true;
+      console.error("Error loading DVD image");
     };
-
-    startBtn.addEventListener("click", () => {
-      if (!dvdLogo.complete) {
-        statusEl.textContent = "Still loading image…";
-        return;
-      }
-
-      running = true;
-      ui.style.display = "none";
-      animate();
-    });
   </script>
 </body>
 </html>
